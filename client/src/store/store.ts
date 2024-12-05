@@ -20,66 +20,63 @@ type Actions = {
     checkAuth: () => void
 }
 
-export const store = create<State & Actions>((setState) => ({
+const handleError = (error: unknown) => {
+    if (error instanceof Error) console.error('Error:', error.message)
+    else console.error('Unknown error:', error)
+}
+
+export const store = create<State & Actions>((set) => ({
     user: {} as TUser,
     isAuth: false,
     isLoading: false,
-    setUser: (user: TUser) => {
-        setState({user})
-    },
-    setIsAuth: (isAuth: boolean) => {
-        setState({isAuth})
-    },
+    setUser: (user: TUser) => set({user}),
+    setIsAuth: (isAuth: boolean) => set({isAuth}),
     login: async (email, password) => {
         try {
             const response = await AuthService.login(email, password)
-            console.log('response', response)
             localStorage.setItem(token.access, response.data.accessToken)
-            setState({ isAuth: true })
-            setState({ user: response.data.user })
+            set({ isAuth: true })
+            set({ user: response.data.user })
         }
         catch (error) {
-            if (error instanceof Error) console.log(error)
+            handleError(error)
         }
     },
     registration: async (email, password) => {
         try {
             const response = await AuthService.registration(email, password)
-            console.log('response', response)
             localStorage.setItem(token.access, response.data.accessToken)
-            setState({ isAuth: true })
-            setState({ user: response.data.user })
+            set({ isAuth: true })
+            set({ user: response.data.user })
         }
         catch (error) {
-            if (error instanceof Error) console.log(error)
+            handleError(error)
         }
     },
     logout: async () => {
         try {
-            const response = await AuthService.logout()
-            console.log('response', response)
+            await AuthService.logout()
             localStorage.removeItem(token.access)
-            setState({ isAuth: false })
-            setState({ user: {} as TUser })
+            set({ isAuth: false })
+            set({ user: {} as TUser })
         }
         catch (error) {
-            if (error instanceof Error) console.log(error)
+            handleError(error)
         }
     },
     checkAuth: async () => {
-        setState({ isLoading: true })
+        set({ isLoading: true })
         try {
             const response = await axios.get<AuthResponse>(`${BASE_URL}/refresh`, {withCredentials: true})
-            console.log('response', response)
             localStorage.setItem(token.access, response.data.accessToken)
-            setState({ isAuth: true })
-            setState({ user: response.data.user })
+            set({ isAuth: true })
+            set({ user: response.data.user })
         }
         catch (error) {
-            if (error instanceof Error) console.log(error)
+            handleError(error)
         }
         finally {
-            setState({ isLoading: false })
+            set({ isLoading: false })
         }
     }
 }))

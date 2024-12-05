@@ -16,17 +16,14 @@ const App: FC = () => {
     const fetchUsers = async () => {
         try {
             const response = await AuthService.fetchUsers()
-            console.log('response', response)
             setUsers(response.data)
         }
         catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
-    if (isLoading) return (
-        <div>LOADING...</div>
-    )
+    if (isLoading) return <div>LOADING...</div>
     return (
         <main>
             {isAuth ? <>
@@ -35,13 +32,7 @@ const App: FC = () => {
                 <button onClick={() => logout()}>logout</button>
             </> : <LoginForm />}
             <button onClick={fetchUsers}>get users</button>
-            <ul>
-                {users.map((user) => (
-                    <li key={user._id}>
-                        {user.email}
-                    </li>
-                ))}
-            </ul>
+            <ul>{users.map((user) => <li key={user._id}>{user.email}</li>)}</ul>
         </main>
     )
 }
