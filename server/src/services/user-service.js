@@ -21,11 +21,8 @@ class UserService {
         const emailService = new EmailService()
         await emailService.sendActivationEmail(email, `${process.env.API_URL}/api/activate/${activationLink}`)
 
-        /** Генерируем токены и сохраняем refresh в db */
         const userDto = new UserDto(user)
-        const tokens = tokenService.generateTokens({...userDto})
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
-        return {...tokens, user: userDto}
+        return { user: userDto}
     }
 
     async activate(activationLink) {
